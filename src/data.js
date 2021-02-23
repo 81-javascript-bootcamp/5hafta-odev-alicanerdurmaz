@@ -10,7 +10,7 @@ const fetcher = async (url, method = 'get', body = null) => {
     return await response.json();
   } catch (error) {
     alert('Something went wrong, Please Try Again');
-    return false;
+    return null;
   }
 };
 
