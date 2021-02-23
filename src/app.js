@@ -14,12 +14,18 @@ class PomodoroApp {
   }
 
   disableTaskForm() {
+    this.$taskFormInput.value = 'Ekleniyor...';
+    this.$taskFormBtn.innerHTML = 'Ekleniyor...';
+
     this.$taskFormInput.disabled = true;
     this.$taskFormBtn.disabled = true;
   }
   enableTaskForm() {
     this.$taskFormInput.disabled = false;
     this.$taskFormBtn.disabled = false;
+
+    this.$taskFormInput.value = '';
+    this.$taskFormBtn.innerHTML = 'Add Task';
   }
 
   async addTask(task) {
@@ -28,7 +34,6 @@ class PomodoroApp {
     const newTask = await addTaskToApi(task);
     newTask && this.$taskList.appendChild(TaskItem(newTask));
 
-    this.$taskFormInput.value = '';
     this.enableTaskForm();
   }
 
