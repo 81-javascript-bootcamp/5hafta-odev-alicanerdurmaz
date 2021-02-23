@@ -1,26 +1,35 @@
-import { getDataFromApi, addTaskToApi } from './data';
+import { addTaskToApi } from './data';
+import TaskList from './components/TaskList';
+import TaskItem from './components/TaskItem';
 
 class PomodoroApp {
   constructor(options) {
-    let { tableTbodySelector, taskFormSelector } = options;
+    let { tableTbodySelector, taskFormSelector, taskList } = options;
+
     this.$tableTbody = document.querySelector(tableTbodySelector);
     this.$taskForm = document.querySelector(taskFormSelector);
     this.$taskFormInput = this.$taskForm.querySelector('input');
+    this.$taskFormBtn = this.$taskForm.querySelector('button');
+    this.$taskList = document.querySelector(taskList);
   }
 
-  addTask(task) {
-    addTaskToApi(task)
-      .then((data) => data.json())
-      .then((newTask) => {
-        this.addTaskToTable(newTask);
-      });
+  disableTaskForm() {
+    this.$taskFormInput.disabled = true;
+    this.$taskFormBtn.disabled = true;
+  }
+  enableTaskForm() {
+    this.$taskFormInput.disabled = false;
+    this.$taskFormBtn.disabled = false;
   }
 
-  addTaskToTable(task, index) {
-    const $newTaskEl = document.createElement('tr');
-    $newTaskEl.innerHTML = `<th scope="row">${task.id}</th><td>${task.title}</td>`;
-    this.$tableTbody.appendChild($newTaskEl);
+  async addTask(task) {
+    this.disableTaskForm();
+
+    const newTask = await addTaskToApi(task);
+    newTask && this.$taskList.appendChild(TaskItem(newTask));
+
     this.$taskFormInput.value = '';
+    this.enableTaskForm();
   }
 
   handleAddTask() {
@@ -31,17 +40,9 @@ class PomodoroApp {
     });
   }
 
-  fillTasksTable() {
-    getDataFromApi().then((currentTasks) => {
-      currentTasks.forEach((task, index) => {
-        this.addTaskToTable(task, index + 1);
-      });
-    });
-  }
-
-  init() {
-    this.fillTasksTable();
+  async init() {
     this.handleAddTask();
+    await TaskList(this.$taskList);
   }
 }
 
